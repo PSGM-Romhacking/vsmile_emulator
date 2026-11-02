@@ -1,0 +1,25 @@
+[package]
+name = "emu-frontend"
+description = "Reusable emulator frontend (egui): menus, library with covers, remappable controls, save states, rewind, recording, languages"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+emu-api.workspace = true
+eframe.workspace = true
+egui.workspace = true
+rfd.workspace = true
+cpal.workspace = true
+image.workspace = true
+gif.workspace = true
+zip.workspace = true
+sevenz-rust.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+libc.workspace = true
+
+# gamepads outside Linux and FreeBSD (there: the kernel's interfaces, see gamepad.rs)
+[target.'cfg(not(any(target_os = "linux", target_os = "freebsd")))'.dependencies]
+gilrs.workspace = true

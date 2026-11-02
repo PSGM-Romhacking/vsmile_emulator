@@ -1,0 +1,39 @@
+# Shared base for new emulators: the core <-> frontend contract (emu-api) and the
+# reusable frontend (emu-frontend). A new emulator adds its own crates (<system>-core,
+# app, libretro) on top of these two. See README.md.
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+authors = ["Péricles S."]
+
+[workspace.dependencies]
+# workspace crates
+emu-api      = { path = "crates/api" }
+emu-frontend = { path = "crates/frontend" }
+libretro-host = { path = "crates/libretro-host" }
+
+# interface (same versions as Mil Capivaras)
+eframe     = { version = "0.37", default-features = false, features = ["default_fonts", "glow", "wayland", "x11", "clipboard"] }
+egui       = "0.37"
+rfd        = "0.17"
+cpal       = "0.15"
+image      = { version = "0.25", default-features = false, features = ["png"] }
+gif        = "0.13"
+zip        = { version = "9.0", default-features = false, features = ["deflate", "bzip2"] }
+sevenz-rust = "0.6"
+serde      = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+libc       = "0.2"
+libloading = "0.8"
+gilrs      = { version = "0.11", default-features = false, features = ["xinput"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = "debuginfo" # keeps function names for the error reports (crashlog)

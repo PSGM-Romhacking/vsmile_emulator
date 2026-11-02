@@ -1,0 +1,11 @@
+[package]
+name = "toy-core"
+description = "Toy Console: core adapter behind the emu-api contract"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+emu-api.workspace = true
+# TODO(core): the real core goes here (crate, path, or an FFI wrapper)

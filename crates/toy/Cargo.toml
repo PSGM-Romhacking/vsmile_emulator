@@ -1,0 +1,18 @@
+[package]
+name = "toy"
+description = "Toy Console emulator (toy-core core + emu-frontend frontend)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "toy"
+path = "src/main.rs"
+
+[dependencies]
+emu-api.workspace = true
+toy-core = { path = "../toy-core" }
+emu-frontend.workspace = true
+eframe.workspace = true
+egui.workspace = true

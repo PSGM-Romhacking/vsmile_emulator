@@ -1,0 +1,31 @@
+# --- build ---
+target/
+
+# --- test/validation outputs ---
+*.ppm
+*.ram
+
+# --- content that must never be committed: games, BIOS, third-party cores ---
+# Put them in these folders (or anywhere else outside the repo). Commercial ROMs and BIOS
+# belong to their owners; compiled cores keep their own licence.
+/roms/
+/bios/
+/cores/
+/system/
+/saves/
+*.zip
+*.7z
+*.rar
+*.bin
+*.rom
+*.iso
+*.cue
+*.chd
+*.so
+*.dll
+*.dylib
+
+# --- local ---
+.vscode/
+.idea/
+*.swp

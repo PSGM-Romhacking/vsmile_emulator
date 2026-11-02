@@ -1,0 +1,18 @@
+[package]
+name = "libretro-player"
+description = "Plays any libretro core with emu-frontend: libretro-player --core CORE.so [GAME]"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "libretro_player"
+path = "src/main.rs"
+
+[dependencies]
+emu-api.workspace = true
+emu-frontend.workspace = true
+libretro-host.workspace = true
+eframe.workspace = true
+egui.workspace = true
