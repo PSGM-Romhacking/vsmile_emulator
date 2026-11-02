@@ -1,0 +1,11 @@
+[package]
+name = "vsmile-core"
+description = "VTech V.Smile (SunPlus SPG200 / unSP CPU) core behind the emu-api contract"
+version.workspace = true
+edition = "2021"
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+emu-api.workspace = true
+# the machine itself has no dependencies (std only)

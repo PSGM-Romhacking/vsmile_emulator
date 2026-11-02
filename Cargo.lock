@@ -3115,6 +3115,46 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
+name = "vsmile"
+version = "0.1.0"
+dependencies = [
+ "eframe",
+ "egui",
+ "emu-api",
+ "emu-frontend",
+ "vsmile-core",
+]
+
+[[package]]
+name = "vsmile-core"
+version = "0.1.0"
+dependencies = [
+ "emu-api",
+]
+
+[[package]]
+name = "vsmile-libretro"
+version = "0.1.0"
+dependencies = [
+ "emu-api",
+ "vsmile-core",
+]
+
+[[package]]
+name = "vsmile-runner"
+version = "0.1.0"
+dependencies = [
+ "vsmile-core",
+]
+
+[[package]]
+name = "vsmile-wasm"
+version = "0.1.0"
+dependencies = [
+ "vsmile-core",
+]
+
+[[package]]
 name = "walkdir"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

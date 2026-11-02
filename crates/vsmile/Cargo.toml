@@ -1,0 +1,18 @@
+[package]
+name = "vsmile"
+description = "VTech V.Smile emulator (vsmile-core + emu-frontend)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "vsmile"
+path = "src/main.rs"
+
+[dependencies]
+emu-api.workspace = true
+vsmile-core = { path = "../vsmile-core" }
+emu-frontend.workspace = true
+eframe.workspace = true
+egui.workspace = true

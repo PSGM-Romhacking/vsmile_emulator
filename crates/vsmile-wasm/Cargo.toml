@@ -1,0 +1,13 @@
+[package]
+name = "vsmile-wasm"
+description = "V.Smile core for WebAssembly (C ABI, no wasm-bindgen)"
+version.workspace = true
+edition = "2021"
+license.workspace = true
+authors.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+vsmile-core = { path = "../vsmile-core" }

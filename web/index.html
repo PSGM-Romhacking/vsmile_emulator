@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>V.Smile — WebAssembly</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    justify-content: center; background: #15181c; color: #c8ccd2;
+    font: 14px/1.5 system-ui, sans-serif;
+  }
+  h1 { font-size: 18px; font-weight: 600; margin: 16px 0 0; letter-spacing: .5px; }
+  canvas {
+    image-rendering: pixelated;
+    width: 640px; height: 480px;
+    background: #000; border: 1px solid #2a2f36;
+  }
+  .bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: center; }
+  button, label.file {
+    background: #222830; color: #c8ccd2; border: 1px solid #3a414a;
+    padding: 6px 12px; cursor: pointer; font: inherit;
+  }
+  button:hover, label.file:hover { background: #2b323b; }
+  input[type=file] { display: none; }
+  #status { min-height: 1.2em; color: #8b93a0; }
+  .keys { font-size: 12px; color: #767e8b; max-width: 640px; text-align: center; }
+  code { color: #9fb6d6; }
+</style>
+</head>
+<body>
+  <h1>V.Smile — emulador em WebAssembly</h1>
+  <div class="bar">
+    <label class="file">Abrir ROM (.bin / .zip)<input type="file" id="rom" accept=".bin,.zip"></label>
+    <button id="pause" disabled>Pausar</button>
+    <button id="reset" disabled>Reset</button>
+    <button id="sound">Ativar som</button>
+  </div>
+  <canvas id="screen" width="320" height="240"></canvas>
+  <div id="status">Carregando WebAssembly…</div>
+  <div class="keys">
+    Setas = direcional · Enter = OK · Backspace = Voltar · H = Ajuda · A = ABC ·
+    <code>Z X C V</code> = vermelho/verde/azul/amarelo · O/P/R = ligar/desligar/restart
+  </div>
+
+<script>
+(async () => {
+  const status = document.getElementById('status');
+  const canvas = document.getElementById('screen');
+  const ctx2d = canvas.getContext('2d');
+
+  // ---- carrega o módulo wasm ----
+  let wasm;
+  try {
+    const resp = await fetch('vsmile_wasm.wasm');
+    const { instance } = await WebAssembly.instantiate(await resp.arrayBuffer(), {});
+    wasm = instance.exports;
+  } catch (e) {
+    status.textContent = 'Falha ao carregar vsmile_wasm.wasm — sirva a pasta por HTTP (ver README). ' + e;
+    return;
+  }
+  const W = wasm.vsmile_width(), H = wasm.vsmile_height();
+  canvas.width = W; canvas.height = H;
+  const image = ctx2d.createImageData(W, H);
+  status.textContent = 'Pronto. Abra uma ROM.';
+
+  // ---- áudio (Web Audio + ring buffer com reamostragem linear) ----
+  const SPU_RATE = wasm.vsmile_audio_rate();
+  let audioCtx = null, ring = null, ringLen = 0, rHead = 0, rTail = 0;
+  function initAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    ringLen = audioCtx.sampleRate * 2; // ~2 s por canal (estéreo intercalado)
+    ring = new Float32Array(ringLen);
+    const node = audioCtx.createScriptProcessor(2048, 0, 2);
+    node.onaudioprocess = (ev) => {
+      const l = ev.outputBuffer.getChannelData(0);
+      const r = ev.outputBuffer.getChannelData(1);
+      for (let i = 0; i < l.length; i++) {
+        if (rHead !== rTail) {
+          l[i] = ring[rHead]; r[i] = ring[rHead + 1];
+          rHead = (rHead + 2) % ringLen;
+        } else { l[i] = 0; r[i] = 0; }
+      }
+    };
+    node.connect(audioCtx.destination);
+  }
+  // Reamostra o bloco do SPU (~281 kHz) para a taxa do dispositivo e enfileira.
+  let resamplePos = 0;
+  function pushAudio(samples) {
+    if (!audioCtx) return;
+    const ratio = audioCtx.sampleRate / SPU_RATE; // < 1
+    for (let i = 0; i + 1 < samples.length; i += 2) {
+      const l = ((samples[i] ^ 0x8000) << 16 >> 16) / 32768;
+      const r = ((samples[i + 1] ^ 0x8000) << 16 >> 16) / 32768;
+      resamplePos += ratio;
+      if (resamplePos >= 1) {
+        resamplePos -= 1;
+        const next = (rTail + 2) % ringLen;
+        if (next !== rHead) { ring[rTail] = l; ring[rTail + 1] = r; rTail = next; }
+      }
+    }
+  }
+  document.getElementById('sound').onclick = () => {
+    initAudio();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    document.getElementById('sound').textContent = 'Som ligado';
+  };
+
+  // ---- teclado ----
+  const down = new Set();
+  addEventListener('keydown', e => { down.add(e.code); if (handled(e.code)) e.preventDefault(); });
+  addEventListener('keyup', e => down.delete(e.code));
+  function handled(code) {
+    return ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Enter','Backspace',
+            'KeyH','KeyA','KeyZ','KeyX','KeyC','KeyV','KeyO','KeyP','KeyR','Space'].includes(code);
+  }
+  const B = { RED:1, GREEN:2, BLUE:4, YELLOW:8, ENTER:16, BACK:32, HELP:64, ABC:128, ON:256, OFF:512, RESTART:1024 };
+  function inputState() {
+    let x = 0, y = 0, b = 0;
+    if (down.has('ArrowLeft')) x = -5; else if (down.has('ArrowRight')) x = 5;
+    if (down.has('ArrowUp')) y = 5; else if (down.has('ArrowDown')) y = -5;
+    if (down.has('KeyZ')) b |= B.RED;
+    if (down.has('KeyX')) b |= B.GREEN;
+    if (down.has('KeyC')) b |= B.BLUE;
+    if (down.has('KeyV')) b |= B.YELLOW;
+    if (down.has('Enter')) b |= B.ENTER;
+    if (down.has('Backspace')) b |= B.BACK;
+    if (down.has('KeyH')) b |= B.HELP;
+    if (down.has('KeyA')) b |= B.ABC;
+    if (down.has('KeyO')) b |= B.ON;
+    if (down.has('KeyP')) b |= B.OFF;
+    if (down.has('KeyR')) b |= B.RESTART;
+    return { x, y, b };
+  }
+
+  // ---- ciclo de emulação ----
+  let handle = 0, running = false, raf = 0;
+
+  function loadRom(bytes) {
+    if (handle) { wasm.vsmile_free(handle); handle = 0; }
+    const ptr = wasm.vsmile_alloc(bytes.length);
+    new Uint8Array(wasm.memory.buffer, ptr, bytes.length).set(bytes);
+    handle = wasm.vsmile_new(ptr, bytes.length, 0xe, 0);
+    wasm.vsmile_free_buf(ptr, bytes.length);
+    if (!handle) { status.textContent = 'ROM inválida.'; return; }
+    document.getElementById('pause').disabled = false;
+    document.getElementById('reset').disabled = false;
+    status.textContent = 'Rodando.';
+    start();
+  }
+
+  function frame() {
+    if (!running || !handle) return;
+    const inp = inputState();
+    wasm.vsmile_set_input(handle, inp.x, inp.y, inp.b);
+    wasm.vsmile_run_frame(handle);
+
+    // vídeo
+    const rgbaPtr = wasm.vsmile_rgba_ptr(handle);
+    const rgba = new Uint8Array(wasm.memory.buffer, rgbaPtr, wasm.vsmile_rgba_len());
+    image.data.set(rgba);
+    ctx2d.putImageData(image, 0, 0);
+
+    // áudio
+    const aLen = wasm.vsmile_audio_len(handle);
+    if (aLen > 0 && audioCtx) {
+      const aPtr = wasm.vsmile_audio_ptr(handle);
+      pushAudio(new Uint16Array(wasm.memory.buffer, aPtr, aLen));
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  function start() { if (!running) { running = true; raf = requestAnimationFrame(frame); } }
+  function stop() { running = false; cancelAnimationFrame(raf); }
+
+  document.getElementById('rom').onchange = async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    status.textContent = 'Carregando ' + f.name + '…';
+    loadRom(new Uint8Array(await f.arrayBuffer()));
+  };
+  document.getElementById('pause').onclick = () => {
+    if (running) { stop(); document.getElementById('pause').textContent = 'Continuar'; }
+    else { start(); document.getElementById('pause').textContent = 'Pausar'; }
+  };
+  document.getElementById('reset').onclick = () => { if (handle) wasm.vsmile_reset(handle); };
+})();
+</script>
+</body>
+</html>

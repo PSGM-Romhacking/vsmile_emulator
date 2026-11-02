@@ -1,0 +1,62 @@
+modo lote: 569 ROMs, 240 quadros cada
+
+lista completa das 569 ROMs: COMPATIBILIDADE_completa.csv
+
+==== relatório de compatibilidade ====
+  acervo: 569 ROMs (3 bad dump(s) ignorado(s) → 566 válidas)
+  boot limpo (desenhou algo): 524/566 (92.6%)
+  tela preta:                 35
+  opcode desconhecido:        7
+  erro de carregamento:       0
+  panic (crash):              0
+
+-- boot limpo por variante (sem bad dumps) --
+  padrao : 428/431 (99.3%)
+  motion : 96/105 (91.4%)
+  baby   : 0/30 (0.0%)
+
+-- opcodes desconhecidos (1ª ocorrência) por frequência --
+  iw=0x55AA (op0=5 op1n=53) em 6 ROM(s)
+  iw=0xFFFF (op0=f op1n=63) em 1 ROM(s)
+
+-- tela preta --
+  A Day on the Farm (USA) (V.Smile Baby).zip
+  Adventures of Little Red Riding Hood, The (USA).zip
+  Arche de Noe, L' - L'aventure des animaux (France) (V.Smile Baby).zip
+  Baby Einstein (USA) (V.Smile Baby) (Alt).zip
+  Baby Einstein (USA) (V.Smile Baby).zip
+  Baby Einstein - Un monde de decouvertes (France) (V.Smile Baby).zip
+  Baby Einstein - World of Discoveries (USA) (Rev 1) (V.Smile Baby).zip
+  Baby Einstein - World of Discoveries (USA) (V.Smile Baby).zip
+  Backyardigans, The - Big Backyard Adventures (USA) (V.Smile Baby).zip
+  Barney (USA) (V.Smile Baby).zip
+  Barney - Let's Go to a Party (USA) (V.Smile Baby).zip
+  Care Bears (USA) (V.Smile Baby).zip
+  Day on the Farm, A (USA) (V.Smile Baby).zip
+  Decouvertes de Mickey et ses amis, Les (France) (V.Smile Baby).zip
+  Dierenhuis (Netherlands) (V.Smile Baby).zip
+  Discovery with Baby Mickey & Friends (USA) (V.Smile Baby).zip
+  Disney Baby - Nalle Puhs aeventyr i Sjumilaskogen (Sweden) (V.Smile Baby).zip
+  Disney Baby - Pooh's Hundred Acre Wood Adventure (USA) (V.Smile Baby).zip
+  Disney-Pixar Toy Story 2 - Operation Rescue Woody! (USA).zip
+  Fur immer Shrek (Germany) (Rev 1) (V.Smile Motion).zip
+  Maison Des Animaux, La (France) (V.Smile Baby).zip
+  Mein erster Bauernhof (Germany) (V.Smile Baby).zip
+  Meine kleinen Tierfreunde (Germany) (V.Smile Baby).zip
+  Mother Goose (USA) (V.Smile Baby).zip
+  Nalle Puhs aeventyr i Sjumilaskogen (Sweden) (V.Smile Baby).zip
+  Noah's Ark - Animal Adventures (USA) (V.Smile Baby).zip
+  Pooh's Hundred Acre Wood Adventure (USA) (V.Smile Baby).zip
+  Shrek 4 - Il etait une fin (France) (Rev 1) (V.Smile Motion).zip
+  Super WHY! - The Beach Day Mystery (USA) (V.Smile Motion).zip
+  Teletubbies - C'est l'heure des Teletubbies (France) (V.Smile Baby).zip
+  ... (+5)
+
+-- opcode desconhecido (ROM: contagem, 1ª instr.) --
+  Cars 2 (USA) (Rev 1) (V.Smile Motion) (Pocket Version).zip: 17879954x, 1ª CS:PC=000001 iw=55AA
+  Cars 2 (USA) (V.Smile Motion).zip: 27537866x, 1ª CS:PC=000001 iw=55AA
+  Disney-Pixar Toy Story 3 (France) (V.Smile Motion).zip: 46x, 1ª CS:PC=000001 iw=55AA
+  Disney-Pixar Toy Story 3 (USA) (V.Smile Motion).zip: 94x, 1ª CS:PC=000001 iw=55AA
+  Shrek Forever After (USA) (V.Smile Motion).zip: 230598x, 1ª CS:PC=000001 iw=55AA
+  Toy Story 3 (USA) (V.Smile Motion).zip: 94x, 1ª CS:PC=000001 iw=55AA
+  Zayzoo - My Alien Classmate (USA).zip: 320627x, 1ª CS:PC=045105 iw=FFFF

@@ -1,0 +1,14 @@
+[package]
+name = "vsmile-runner"
+description = "Headless V.Smile runner: loads a ROM, runs N frames, saves a screenshot; batch compatibility and debugging tools"
+version.workspace = true
+edition = "2021"
+license.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "vsmile-run"
+path = "src/main.rs"
+
+[dependencies]
+vsmile-core = { path = "../vsmile-core" }

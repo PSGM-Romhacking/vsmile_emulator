@@ -1,0 +1,15 @@
+[package]
+name = "vsmile-libretro"
+description = "V.Smile Emulator as a libretro core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[lib]
+name = "vsmile_libretro"
+crate-type = ["cdylib"]
+
+[dependencies]
+emu-api.workspace = true
+vsmile-core = { path = "../vsmile-core" }
